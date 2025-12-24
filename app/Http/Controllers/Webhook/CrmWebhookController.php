@@ -103,7 +103,7 @@ class CrmWebhookController extends Controller
             'scopesAssignedToOnly' => $crmUserTemplate->scopesAssignedToOnly ?? [],
         ];
 
-        $newCrmUser = $crmService->createUser($userData, $agency->user->crm_location_id);
+        $newCrmUser = $crmService->createUser($userData);
 
         $user = User::firstOrCreate(
             ['email' => $contactEmail, 'agency_id' => $agency->id],

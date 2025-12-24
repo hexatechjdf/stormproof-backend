@@ -206,10 +206,10 @@ class GhlApiService
         $response = $this->makeRequest($endpoint, 'GET');
         return $response ?? [];
     }
-    public function createUser(array $userData, $locationId = null)
+    public function createUser(array $userData)
     {
         if (!$this->userContext) throw new \Exception('User context not set.');
-        $endpoint = 'users/?locationId=' . $locationId;
+        $endpoint = 'users/';
         $response = $this->makeRequest($endpoint, 'POST', $userData);
         $status = $response->statusCode ?? $response->status ?? null;
 

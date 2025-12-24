@@ -83,8 +83,9 @@
             </div>
     </form>
 
-    <form method="POST" action="{{ route('admin.settings.update', ['agency' => Auth::user()->agency_id]) }}">
+    <form action="{{ route('admin.settings.update', ['agency' => Auth::user()->agency_id]) }}" method="POST">
         @csrf
+        @method('PUT')
         <input type="hidden" name="plansMappingForm" value="true" />
         <div class="col-lg-8">
             <div class="card mt-3">

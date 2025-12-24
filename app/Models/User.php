@@ -28,6 +28,7 @@ class User extends Authenticatable
         'crm_user_id',
         'companycam_user_id',
         'crm_contact_id',
+        'company_id',
     ];
 
     /**

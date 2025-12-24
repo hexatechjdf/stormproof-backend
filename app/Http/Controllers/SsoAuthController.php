@@ -39,6 +39,9 @@ class SsoAuthController extends Controller
      */
     public function validateToken(Request $request)
     {
+        if (Auth::check()) {
+            Auth::logout();
+        }
         try {
             $request->validate([
                 'app_id' => 'required|string',

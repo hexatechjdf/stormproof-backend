@@ -111,7 +111,7 @@ class CrmWebhookController extends Controller
                 'name' => $contactName,
                 'password' => Hash::make('password'),
                 'role' => 'homeowner',
-                'crm_location_id' => $agency->user->crm_location_id,
+                'crm_location_id' => $templateLocationId,
                 'crm_user_id' => $newCrmUser->id,
             ]
         );

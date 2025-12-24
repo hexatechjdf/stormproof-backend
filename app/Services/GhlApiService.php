@@ -17,7 +17,7 @@ class GhlApiService
 
     private ?Agency $userContext = null;
     private ?CrmAuths $tokenRecord = null;
-
+    private $company_id = null;
     public function forUser(Agency $agency, $location_id = null): self
     {
         $this->userContext = $agency;
@@ -30,6 +30,7 @@ class GhlApiService
         } else {
             $this->tokenRecord = CrmAuths::where('agency_id', $agency->id)->where('user_type', 'Company')->first();
         }
+        $this->company_id = $this->tokenRecord->company_id;
         return $this;
     }
     private function makeRequest(string $endpoint, string $method = 'GET', array $data = [], int $retries = 0)
@@ -175,8 +176,8 @@ class GhlApiService
     public function getLocations()
     {
         if (!$this->userContext) throw new \Exception('User context not set.');
-        $endpoint = 'locations/search?limit=100';
-        $response = $this->makeRequest($endpoint, 'GET');
+        $endpoint = 'locations/search?companyId=' . $this->company_id . '&limit=100';
+        $response = $this->makeRequest($endpoint, 'GET', ['companyId' => $this->company_id]);
         return $response ?? [];
     }
     public function getProducts($location_id = null)
@@ -195,15 +196,16 @@ class GhlApiService
     public function getUsers()
     {
         if (!$this->userContext) throw new \Exception('User context not set.');
-        $endpoint = 'users';
-        $response = $this->makeRequest($endpoint, 'GET');
+        $endpoint = 'users/?companyId=' . $this->company_id;
+        $response = $this->makeRequest($endpoint, 'GET', ['companyId' => $this->company_id]);
+        dd($response);
         return $response ?? [];
     }
     public function getUsersByLocation($locationId)
     {
         if (!$this->userContext) throw new \Exception('User context not set.');
         $endpoint = 'users/?locationId=' . $locationId;
-        $response = $this->makeRequest($endpoint, 'GET');
+        $response = $this->makeRequest($endpoint, 'GET', ['locationId' => $locationId]);
         return $response ?? [];
     }
     public function createUser(array $userData, $locationId)
@@ -222,7 +224,7 @@ class GhlApiService
     {
         if (!$this->userContext) throw new \Exception('User context not set.');
         $endpoint = 'users/' . $userId . '?locationId=' . $locationId;
-        $response = $this->makeRequest($endpoint, 'GET');
+        $response = $this->makeRequest($endpoint, 'GET', ['locationId' => $locationId]);
 
         if (!isset($response)) {
             throw new \Exception("Failed to fetch CRM user by ID. Response: " . json_encode($response));
@@ -245,7 +247,7 @@ class GhlApiService
     {
         if (!$this->userContext) throw new \Exception('User context not set.');
         $endpoint = 'calendars/?locationId=' . $location_id;
-        $response = $this->makeRequest($endpoint, 'GET');
+        $response = $this->makeRequest($endpoint, 'GET', ['locationId' => $location_id]);
         return $response ?? [];
     }
     public function uploadFile($payload, $location_id)

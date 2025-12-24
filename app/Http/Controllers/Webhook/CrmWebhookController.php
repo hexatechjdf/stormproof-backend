@@ -97,7 +97,7 @@ class CrmWebhookController extends Controller
             'role' => 'homeowner',
             'type' => $crmUserTemplate->roles->type ?? 'user',
             'role' => $crmUserTemplate->roles->role ?? 'user',
-            'locationIds' => [$locationId],
+            'locationIds' => [$agency->user->crm_location_id],
             'permissions' => $crmUserTemplate->permissions ?? [],
             'scopes'    => $crmUserTemplate->scopes ?? [],
             'scopesAssignedToOnly' => $crmUserTemplate->scopesAssignedToOnly ?? [],

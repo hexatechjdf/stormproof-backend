@@ -99,25 +99,29 @@ class SsoAuthController extends Controller
             // Extract location
             $locationId = $payload['activeLocation'] ?? null;
             $crmUserId = $payload['userId'] ?? null;
+            $companyId = $payload['companyId'] ?? null;
+            if (!$locationId && $companyId) {
+                $user = User::where('company_id', $companyId)->first();
+            } else {
+                if (!$locationId) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Location id missing from token.'
+                    ], 400);
+                }
 
-            if (!$locationId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Company ID missing from token.'
-                ], 400);
+                // Match user by location_id
+                $user = User::where('crm_location_id', $locationId)
+                    ->where('crm_user_id', $crmUserId)
+                    ->first();
             }
 
-            // Match user by location_id
-            $user = User::where('id',10)
-            // where('crm_location_id', $locationId)
-            // ->where('crm_user_id',$crmUserId)
-            ->first();
-           
+
             if (!$user) {
                 return response()->json([
                     'success' => false,
                     'message' =>
-                    "Location not found in system. Please uninstall and reinstall the app."
+                    "User Configuration Missing."
                 ], 404);
             }
 

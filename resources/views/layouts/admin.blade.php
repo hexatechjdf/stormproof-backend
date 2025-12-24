@@ -13,7 +13,7 @@
         .navbar {
             padding: 12px 22px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            background-color: #495057 !important;
+            background-color:  #9f93f3 !important;
         }
 
         /* Wrap the links nicely */
@@ -70,7 +70,8 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">{{ Auth::user()->agency->name }}</a>
+            <a class="navbar-brand" href="#"> <img src="{{ asset('images/stormprooflogo.png') }}"
+                    alt="{{ config('app.name') }}" height="40"></a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
@@ -115,7 +116,7 @@
     <main class="container mt-4">
         @yield('content')
     </main>
-     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>

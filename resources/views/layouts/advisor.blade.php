@@ -16,7 +16,7 @@
         .navbar {
             padding: 12px 22px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            background-color: #495057 !important;
+            background-color:  #9f93f3 !important;
         }
 
         /* Wrap the links nicely */

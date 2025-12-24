@@ -29,6 +29,7 @@ use App\Http\Controllers\Homeowner\HomeQuestionnaireController;
 use App\Http\Controllers\Homeowner\PhotoReportController;
 use App\Http\Controllers\Homeowner\ProjectController;
 use App\Http\Controllers\Homeowner\StormKitController;
+use App\Http\Controllers\SsoAuthController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -178,3 +179,4 @@ Route::get('custom-logout', function () {
 });
 
 Route::get('/refresh-crm-tokens', [CrmController::class, 'refreshCrmTokens']);
+Route::post('/validate-sso', [SsoAuthController::class, 'validateToken'])->name('validate.sso');

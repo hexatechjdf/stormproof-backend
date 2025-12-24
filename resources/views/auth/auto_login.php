@@ -40,7 +40,7 @@
 
             // Step 3: Call Laravel API with SSO token
             try {
-                const response = await fetch("/api/validate-sso", {
+                const response = await fetch("/validate-sso", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -48,7 +48,8 @@
                     },
                     body: JSON.stringify({
                         sso_token: ssoToken,
-                        app_id: APP_ID
+                        app_id: APP_ID,
+                        _token: '{{csrf_token()}}'
                     })
                 });
 

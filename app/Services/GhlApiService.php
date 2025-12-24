@@ -58,7 +58,6 @@ class GhlApiService
                 break;
             }
         }
-
         if ($hasFile) {
             // Multipart request
             $multipartData = [];
@@ -86,7 +85,6 @@ class GhlApiService
                 ? $request->get($url, $data)
                 : $request->{$method}($url, $data);
         }
-
         if ($response->failed()) {
             Log::error('GHL API Request Failed', [
                 'user_id'  => $this->userContext->id ?? null,
@@ -179,6 +177,19 @@ class GhlApiService
         if (!$this->userContext) throw new \Exception('User context not set.');
         $endpoint = 'locations/search?limit=100';
         $response = $this->makeRequest($endpoint, 'GET');
+        return $response ?? [];
+    }
+    public function getProducts($location_id = null)
+    {
+        if (!$this->userContext) throw new \Exception('User context not set.');
+        $endpoint = 'products/?limit=100';
+        $response = $this->makeRequest($endpoint, 'GET', ['locationId' => $location_id]);
+        return $response ?? [];
+    }
+    public function getProductPrices($productId, $locationId)
+    {
+        $endpoint = "products/{$productId}/price";
+        $response = $this->makeRequest($endpoint, 'GET', ['locationId' => $locationId]);
         return $response ?? [];
     }
     public function getUsers()

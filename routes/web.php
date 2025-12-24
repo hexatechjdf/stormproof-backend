@@ -64,6 +64,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('inspections/{inspection}/partner-jobs', [PartnerJobController::class, 'store'])->name('partner_jobs.store');
 
 
+    Route::get('/crm/products/{productId}/prices', [AdminSystemSettingsController::class, 'getProductPrices'])->name('crmProduct.prices');
 
     Route::get('settings/{agency}', [AdminSystemSettingsController::class, 'index'])->name('settings.index');
     Route::get('setting-user-mapping/{agency}', [AdminSystemSettingsController::class, 'userMapping'])->name('settings.user-mapping');
@@ -79,11 +80,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::resource('photo-report', AdminPhotoReportController::class)->only(['index', 'show', 'store', 'destroy']);
     Route::post('photo-report/{report}/download', [AdminPhotoReportController::class, 'download'])->name('photo-report.download');
-    
-    
+
+
     Route::resource('claim-documents', AdminClaimDocumentController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::post('claim-documents/{claim-documents}/download', [AdminClaimDocumentController::class, 'download'])->name('claim-documents.download');
-
 });
 
 // Group for Homeowners
@@ -122,7 +122,7 @@ Route::middleware(['auth', 'role:homeowner'])->prefix('homeowner')->name('homeow
         Route::resource('storm-kit', StormKitController::class)->names('storm-kit');
 
         Route::resource('questionnaire', HomeQuestionnaireController::class)->names('questionnaire');
-        Route::get('storm-session-kit', [HomeQuestionnaireController::class,'getStormSeasonKit'])->name('storm.season.index');
+        Route::get('storm-session-kit', [HomeQuestionnaireController::class, 'getStormSeasonKit'])->name('storm.season.index');
 
         Route::resource('contact-support', ContactController::class);
 
@@ -174,7 +174,7 @@ Route::get('custom-logout', function () {
     if (Auth::check()) {
         Auth::logout();
     }
-    return redirect('/home'); 
+    return redirect('/home');
 });
 
 Route::get('/refresh-crm-tokens', [CrmController::class, 'refreshCrmTokens']);

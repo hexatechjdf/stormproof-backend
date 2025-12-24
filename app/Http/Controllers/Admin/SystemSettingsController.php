@@ -26,7 +26,7 @@ class SystemSettingsController extends Controller
             'response_type' => 'code',
             'redirect_uri' => route('crm.oauth_callback', 'crm'),
             'client_id' => $settings['crm_client_id'] ?? '',
-            'scope' => 'medias.write medias.readonly calendars.readonly marketplace-installer-details.readonly users.readonly users.write companies.readonly oauth.write calendars/events.write calendars/events.readonly contacts.write contacts.readonly oauth.readonly locations.readonly',
+            'scope' => 'products.readonly products/prices.readonly medias.write medias.readonly calendars.readonly marketplace-installer-details.readonly users.readonly users.write companies.readonly oauth.write calendars/events.write calendars/events.readonly contacts.write contacts.readonly oauth.readonly locations.readonly',
             'state' => $state,
         ]);
         $connectUrl = 'https://marketplace.gohighlevel.com/oauth/chooselocation?' . $queryParams;
@@ -45,14 +45,13 @@ class SystemSettingsController extends Controller
         $crmLocations = [];
         if (!empty($agency->crmToken)) {
             $crmService = new CrmService($agency);
-            $crmLocations = $crmService->getLocations();
+            $crmLocationsResponse = $crmService->getLocations();
 
-            if (!empty($crmLocations) && property_exists($crmLocations, 'locations')) {
-                $crmLocations = $crmLocations->locations;
+            if (!empty($crmLocationsResponse) && property_exists($crmLocationsResponse, 'locations')) {
+
+                $crmLocations = $crmLocationsResponse->locations;
             }
         }
-
-
         $crmCalendars = [];
 
         return view('admin.settings.index', compact('crmCalendars', 'crmLocations', 'agency', 'settings', 'settingKeys', 'connectUrl', 'company_name', 'company_id'));
@@ -63,6 +62,21 @@ class SystemSettingsController extends Controller
      */
     public function update(Request $request, Agency $agency)
     {
+        if ($request->has('plansMappingForm')) {
+            $request->validate([
+                'settings.product_prices' => 'required|array',
+                'settings.product_prices.*' => 'nullable|array',
+            ]);
+
+            $productPrices = $request->input('settings.product_prices', []);
+
+            $agency->settings()->updateOrCreate(
+                ['key' => 'product_prices'], // single key for all products
+                ['value' => json_encode($productPrices)]
+            );
+
+            return redirect()->back()->with('success', 'Plans mapping updated successfully.');
+        }
         $validated = $request->validate([
             'settings' => 'required|array',
             'settings.crm_client_id' => 'nullable|string',
@@ -89,17 +103,27 @@ class SystemSettingsController extends Controller
     }
     public function userMapping(Agency $agency)
     {
-
+        $locationId = CRM::getDefault('primary_location', '', $agency);
+        $crmLocations = [];
         $crmService = new CrmService($agency);
-        $crmLocations = $crmService->getLocations();
-
-        if (!empty($crmLocations) && property_exists($crmLocations, 'locations')) {
-            $crmLocations = $crmLocations->locations;
+        $crmLocationsResponse = $crmService->getLocations();
+        $crmProducts = $crmService->getProducts($locationId);
+        if (!empty($crmLocationsResponse) && property_exists($crmLocationsResponse, 'locations')) {
+            $crmLocations = $crmLocationsResponse->locations;
+        }
+        if (!empty($crmProducts) && property_exists($crmProducts, 'products')) {
+            $crmProducts = $crmProducts->products;
         }
         $crmUsers = [];
         $settings = $agency->settings->pluck('value', 'key');
-        return view('admin.settings.user-mapping', compact('agency', 'settings', 'crmLocations', 'crmUsers'));
+        $selectedMappings = [];
+        $productPricesSetting  = $settings['product_prices'] ?? [];
+        if ($productPricesSetting) {
+            $selectedMappings = json_decode($productPricesSetting, true);
+        }
+        return view('admin.settings.user-mapping', compact('agency', 'selectedMappings', 'settings', 'crmLocations', 'crmProducts', 'crmUsers'));
     }
+
     public function homeOwnerMenu(Agency $agency)
     {
         // Fetch all agency settings as key => value
@@ -197,5 +221,25 @@ class SystemSettingsController extends Controller
                 'message' => 'Failed to load users for this location',
             ], 500);
         }
+    }
+    public function getProductPrices($productId)
+    {
+        $agency = CRM::getAgency();
+        $locationId = CRM::getDefault('primary_location', '', $agency);
+        $crmService = new CrmService($agency);
+        $prices = $crmService->getProductPrices($productId, $locationId);
+        if (!empty($prices) && property_exists($prices, 'prices')) {
+            $prices = $prices->prices;
+        }
+        if ($prices) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $prices,
+            ]);
+        }
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to load product prices',
+        ], 500);
     }
 }

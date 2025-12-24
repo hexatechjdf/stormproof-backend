@@ -25,7 +25,7 @@ class CRM
     public static $lang_com = 'Company';
     public static $lang_loc = 'Location';
     protected static $userType = ['Company' => 'company_id', 'Location' => 'location_id'];
-    public static $scopes = 'medias.write medias.readonly calendars.readonly contacts.readonly locations.readonly locations/tags.readonly locations/tags.write payments/orders.readonly payments/orders.write payments/subscriptions.readonly payments/transactions.readonly payments/custom-provider.readonly payments/custom-provider.write products.readonly products/prices.readonly invoices.readonly';
+    public static $scopes = 'products.readonly products/prices.readonly medias.write medias.readonly calendars.readonly contacts.readonly locations.readonly locations/tags.readonly locations/tags.write payments/orders.readonly payments/orders.write payments/subscriptions.readonly payments/transactions.readonly payments/custom-provider.readonly payments/custom-provider.write products.readonly products/prices.readonly invoices.readonly';
     protected static $no_token = 'No Token';
     protected static $no_record = 'No Data';
     public static function supersetting($key, $default = '')

@@ -27,6 +27,14 @@ class CrmService
     {
         return $this->ghlApi->forUser($this->agency)->getLocations();
     }
+    public function getProducts($locationId = null)
+    {
+        return $this->ghlApi->forUser($this->agency, $locationId)->getProducts($locationId);
+    }
+    public function getProductPrices($productId, $locationId)
+    {
+        return $this->ghlApi->forUser($this->agency, $locationId)->getProductPrices($productId, $locationId);
+    }
     public function getUsers()
     {
         return $this->ghlApi->forUser($this->agency)->getUsers();

@@ -58,7 +58,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-4 d-none">
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">Stripe (OAuth)</h5>

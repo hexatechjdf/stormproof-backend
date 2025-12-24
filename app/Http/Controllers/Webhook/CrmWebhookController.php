@@ -86,8 +86,9 @@ class CrmWebhookController extends Controller
         }
 
         $templateUserId = CRM::getDefault('homeowner_clone_user_id', null, $agency);
+        $templateLocationId = CRM::getDefault('homeowner_clone_location_id', null, $agency);
         $crmService = new CrmService($agency);
-        $crmUserTemplate = $crmService->getCrmUserById($templateUserId, $agency->user->crm_location_id);
+        $crmUserTemplate = $crmService->getCrmUserById($templateUserId, $templateLocationId);
         $userData = [
             'companyId' => $agency->crmToken?->company_id,
             'firstName' => $firstName,
@@ -97,13 +98,12 @@ class CrmWebhookController extends Controller
             'role' => 'homeowner',
             'type' => $crmUserTemplate->roles->type ?? 'user',
             'role' => $crmUserTemplate->roles->role ?? 'user',
-            'locationIds' => [$agency->user->crm_location_id],
+            'locationIds' => [$templateLocationId],
             'permissions' => $crmUserTemplate->permissions ?? [],
             'scopes'    => $crmUserTemplate->scopes ?? [],
             'scopesAssignedToOnly' => $crmUserTemplate->scopesAssignedToOnly ?? [],
         ];
-
-        $newCrmUser = $crmService->createUser($userData);
+        $newCrmUser = $crmService->createUser($userData,$templateLocationId);
 
         $user = User::firstOrCreate(
             ['email' => $contactEmail, 'agency_id' => $agency->id],

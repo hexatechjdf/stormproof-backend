@@ -28,7 +28,7 @@ class GhlApiService
             }
             $this->tokenRecord = $token;
         } else {
-            $this->tokenRecord = CrmAuths::where('agency_id', $agency->id)->first();
+            $this->tokenRecord = CrmAuths::where('agency_id', $agency->id)->where('user_type', 'Company')->first();
         }
         return $this;
     }
@@ -206,10 +206,10 @@ class GhlApiService
         $response = $this->makeRequest($endpoint, 'GET');
         return $response ?? [];
     }
-    public function createUser(array $userData)
+    public function createUser(array $userData, $locationId)
     {
         if (!$this->userContext) throw new \Exception('User context not set.');
-        $endpoint = 'users/';
+        $endpoint = 'users/?locationId=' . $locationId;
         $response = $this->makeRequest($endpoint, 'POST', $userData);
         $status = $response->statusCode ?? $response->status ?? null;
 

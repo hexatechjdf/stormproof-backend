@@ -47,9 +47,9 @@ class CrmService
     {
         return $this->ghlApi->forUser($this->agency, $locationId)->getCrmUserById($userId,$locationId);
     }
-    public function createUser(array $userData)
+    public function createUser(array $userData, $locationId)
     {
-        return $this->ghlApi->forUser($this->agency)->createUser($userData);
+        return $this->ghlApi->forUser($this->agency, $locationId)->createUser($userData,$locationId);
     }
     public function createAppointment(array $appointmentData, $locationId = null)
     {

@@ -50,6 +50,8 @@ class CrmWebhookController extends Controller
     {
         $contactEmail = $payload['email'] ?? $payload['contact']['email'] ?? null;
         $contactName = $payload['full_name'] ?? $payload['contact']['name'] ?? null;
+        $firstName = $payload['first_name'];
+        $lastName = $payload['last_name'];
         $locationId = $payload['location']['id'] ?? null;
 
         if (!$locationId) {
@@ -88,10 +90,10 @@ class CrmWebhookController extends Controller
         $crmUserTemplate = $crmService->getCrmUserById($templateUserId, $agency->user->crm_location_id);
         $userData = [
             'companyId' => $agency->crmToken?->company_id,
-            'firstName' => $contactName,
-            'lastName' => $contactName,
+            'firstName' => $firstName,
+            'lastName' => $lastName,
             'email' => $contactEmail,
-            'password' => Hash::make('password123!'),
+            'password' => Hash::make('password'),
             'role' => 'homeowner',
             'type' => $crmUserTemplate->roles->type ?? 'user',
             'role' => $crmUserTemplate->roles->role ?? 'user',
@@ -101,7 +103,7 @@ class CrmWebhookController extends Controller
             'scopesAssignedToOnly' => $crmUserTemplate->scopesAssignedToOnly ?? [],
         ];
 
-        $newCrmUser = $crmService->createUser($userData, $locationId);
+        $newCrmUser = $crmService->createUser($userData, $agency->user->crm_location_id);
 
         $user = User::firstOrCreate(
             ['email' => $contactEmail, 'agency_id' => $agency->id],
@@ -109,7 +111,7 @@ class CrmWebhookController extends Controller
                 'name' => $contactName,
                 'password' => Hash::make('password'),
                 'role' => 'homeowner',
-                'crm_location_id' => $locationId,
+                'crm_location_id' => $agency->user->crm_location_id,
                 'crm_user_id' => $newCrmUser->id,
             ]
         );

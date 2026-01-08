@@ -63,19 +63,33 @@ class SystemSettingsController extends Controller
     public function update(Request $request, Agency $agency)
     {
         if ($request->has('plansMappingForm')) {
+            $type = $request->input('plansMappingForm');
+            $keyMap = [
+                'homeowner' => 'homeowner_product_prices',
+                'advisor'   => 'advisor_product_prices',
+            ];
+            if (!isset($keyMap[$type])) {
+                return redirect()->back()->with('error', 'Invalid plan mapping type.');
+            }
+            $settingsKey = $keyMap[$type];
+
             $request->validate([
-                'settings.product_prices' => 'required|array',
-                'settings.product_prices.*' => 'nullable|array',
+                "settings.$settingsKey"   => 'required|array',
+                "settings.$settingsKey.*" => 'nullable|array',
             ]);
 
-            $productPrices = $request->input('settings.product_prices', []);
+
+            $productPrices = $request->input("settings.$settingsKey", []);
 
             $agency->settings()->updateOrCreate(
-                ['key' => 'product_prices'], // single key for all products
+                ['key' => $settingsKey],
                 ['value' => json_encode($productPrices)]
             );
 
-            return redirect()->back()->with('success', 'Plans mapping updated successfully.');
+            return redirect()->back()->with(
+                'success',
+                ucfirst($type) . ' plan mapping updated successfully.'
+            );
         }
         $validated = $request->validate([
             'settings' => 'required|array',
@@ -116,10 +130,20 @@ class SystemSettingsController extends Controller
         }
         $crmUsers = [];
         $settings = $agency->settings->pluck('value', 'key');
-        $selectedMappings = [];
-        $productPricesSetting  = $settings['product_prices'] ?? [];
-        if ($productPricesSetting) {
-            $selectedMappings = json_decode($productPricesSetting, true);
+
+        $selectedMappings = [
+            'homeowner_product_prices' => [],
+            'advisor_product_prices'   => [],
+        ];
+
+        if (!empty($settings['homeowner_product_prices'])) {
+            $selectedMappings['homeowner_product_prices'] =
+                json_decode($settings['homeowner_product_prices'], true);
+        }
+
+        if (!empty($settings['advisor_product_prices'])) {
+            $selectedMappings['advisor_product_prices'] =
+                json_decode($settings['advisor_product_prices'], true);
         }
         return view('admin.settings.user-mapping', compact('agency', 'selectedMappings', 'settings', 'crmLocations', 'crmProducts', 'crmUsers'));
     }
